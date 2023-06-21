@@ -1,0 +1,22 @@
+DECLARE  
+  emp_data SYS_REFCURSOR;  
+  emp_rec emp%ROWTYPE;  
+v_empno int; 
+v_depno int; 
+BEGIN  
+v_empno :=null; 
+v_depno :=null; 
+  -- Call the function with specific emp_no and dept_no  
+  emp_data := get_employee_data(v_empno , v_depno );  
+  
+  -- Fetch and display the result set  
+  LOOP  
+    FETCH emp_data INTO emp_rec;  
+    EXIT WHEN emp_data%NOTFOUND;  
+    -- Access the fields of emp_rec (e.g., emp_rec.empno, emp_rec.ename, etc.)  
+    DBMS_OUTPUT.PUT_LINE(emp_rec.ename || ' 	' || emp_rec.ename || '		 ' ||emp_rec.job  );  
+  END LOOP;  
+  
+  -- Close the cursor  
+  CLOSE emp_data;  
+END; 
