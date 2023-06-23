@@ -1,0 +1,3 @@
+create a script for xls file update the data form Tickets tab to BiWeeklytickets tab, 
+copy these column value form Tickets tab Case#, 	Description,	Status,	Requested For Organization,	Updates/Comments
+into BiWeeklyTickets
