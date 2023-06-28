@@ -40,3 +40,48 @@ var parameters = new Dictionary<string, object>
 };
 
 var customers = ExecuteStoredProcedureWithParameters("YourStoredProcedure", parameters);
+
+//otehr Approch
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+
+public class DataAccess
+{
+    private readonly ApplicationDbContext _context;
+
+    public DataAccess(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    public List<Customer> ExecuteStoredProcedureWithParameters(string storedProcedureName, Dictionary<string, object> parameters)
+    {
+        List<SqlParameter> sqlParameters = new List<SqlParameter>();
+
+        foreach (var parameter in parameters)
+        {
+            SqlParameter sqlParameter = new SqlParameter(parameter.Key, parameter.Value);
+            sqlParameters.Add(sqlParameter);
+        }
+
+        string query = $"EXECUTE {storedProcedureName} {GetSqlParameterString(sqlParameters)}";
+
+        List<Customer> customers = _context.Customers.FromSqlRaw(query, sqlParameters.ToArray()).ToList();
+        return customers;
+    }
+
+    private string GetSqlParameterString(List<SqlParameter> sqlParameters)
+    {
+        List<string> parameterNames = new List<string>();
+
+        foreach (var parameter in sqlParameters)
+        {
+            parameterNames.Add(parameter.ParameterName);
+        }
+
+        return string.Join(", ", parameterNames);
+    }
+}
+
