@@ -1,0 +1,42 @@
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Data;
+
+public class DataAccess
+{
+    private readonly ApplicationDbContext _context;
+
+    public DataAccess(ApplicationDbContext context)
+    {
+        _context = context;
+    }
+
+    public List<Customer> ExecuteStoredProcedureWithParameters(string storedProcedureName, Dictionary<string, object> parameters)
+    {
+        string query = $"EXECUTE {storedProcedureName} ";
+
+        var parameterList = new List<string>();
+        var parameterValues = new List<object>();
+
+        foreach (var parameter in parameters)
+        {
+            parameterList.Add($"@{parameter.Key}");
+            parameterValues.Add(parameter.Value);
+        }
+
+        query += string.Join(", ", parameterList);
+
+        List<Customer> customers = _context.Customers.FromSqlRaw(query, parameterValues.ToArray()).ToList();
+        return customers;
+    }
+}
+//call 
+var parameters = new Dictionary<string, object>
+{
+    { "Parameter1", value1 },
+    { "Parameter2", value2 },
+    // Add other parameters as needed
+};
+
+var customers = ExecuteStoredProcedureWithParameters("YourStoredProcedure", parameters);
