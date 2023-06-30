@@ -1,0 +1,2 @@
+My existing stored procedures are well-tested and performant, I may opt to continue using them in combination with Entity Framework.
+This approach allows me to reuse existing logic and focus on integrating the web API and Angular frontend.
