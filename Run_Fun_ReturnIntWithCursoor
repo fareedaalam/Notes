@@ -1,0 +1,7 @@
+declare return_val number;
+TYPE RC is ref_cursor
+CUR RC;
+begin
+return_val:=yourFunName(RC{YourCur},param1,param2);
+DBMS_SQL.RETURN_RESULT(CUR)
+end;
