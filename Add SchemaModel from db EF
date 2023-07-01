@@ -1,0 +1,2 @@
+dotnet ef dbcontext scaffold "YourSqlConnectionString" Microsoft.EntityFrameworkCore.SqlServer -o Models
+dotnet ef dbcontext scaffold "YourPostgreSqlConnectionString" Npgsql.EntityFrameworkCore.PostgreSQL -o Models
