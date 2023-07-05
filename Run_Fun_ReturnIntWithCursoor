@@ -1,7 +1,9 @@
-declare return_val number;
-TYPE RC is ref_cursor
+DECLARE return_val number;
+TYPE RC is REF CURSOR
 CUR RC;
-begin
+BEGIN
 return_val:=yourFunName(RC{YourCur},param1,param2);
 DBMS_SQL.RETURN_RESULT(CUR)
-end;
+END;
+
+
