@@ -31,3 +31,31 @@ public class JsonPropertyTypeHandler<T> : SqlMapper.TypeHandler<T>
         this.innerHandler.SetValue(parameter, value);
     }
 }
+/===========
+public override User Parse(object value)
+    {
+        if (value is string json)
+        {
+            var dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+            var user = new User();
+
+            foreach (var kvp in dictionary)
+            {
+                var property = typeof(User).GetProperty(kvp.Key);
+
+                if (property != null && property.CanWrite)
+                {
+                    property.SetValue(user, kvp.Value);
+                }
+            }
+
+            return user;
+        }
+
+        throw new ArgumentException("Value must be a JSON string.");
+    }
+
+    public override void SetValue(IDbDataParameter parameter, User value)
+    {
+        parameter.Value = JsonConvert.SerializeObject(value);
+    }
