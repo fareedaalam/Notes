@@ -1,81 +1,33 @@
-create a script for xls file update the data form Tickets tab to BiWeeklytickets tab, 
-copy these column value form Tickets tab Case#, 	Description,	Status,	Requested For Organization,	Updates/Comments
-into BiWeeklyTickets
+public class JsonPropertyTypeHandler<T> : SqlMapper.TypeHandler<T>
+{
+    private readonly SqlMapper.ITypeHandler innerHandler;
 
+    public JsonPropertyTypeHandler()
+    {
+        this.innerHandler = SqlMapper.GetTypeHandler(typeof(T));
+    }
 
-Dim objExcel
-Set objExcel = CreateObject("Excel.Application")
-objExcel.Visible = False
+    public override T Parse(object value)
+    {
+        if (value is string json)
+        {
+            var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+            var data = new Dictionary<string, object>();
 
-' Load the XLS file
-Dim strFilePath
-strFilePath = "C:\Path\To\Your\File.xls"
-Dim objWorkbook
-Set objWorkbook = objExcel.Workbooks.Open(strFilePath)
+            foreach (var kvp in jsonObject)
+            {
+                var propertyName = typeof(T).GetProperty(kvp.Key)?.Name ?? kvp.Key;
+                data.Add(propertyName, kvp.Value);
+            }
 
-' Get the Tickets tab
-Dim objTicketsSheet
-Set objTicketsSheet = objWorkbook.Sheets("Tickets")
+            return (T)this.innerHandler.Parse(data);
+        }
 
-' Get the BiWeeklyTickets tab or create it if it doesn't exist
-Dim strBiWeeklySheetName
-strBiWeeklySheetName = "BiWeeklyTickets"
-Dim objBiWeeklySheet
-On Error Resume Next
-Set objBiWeeklySheet = objWorkbook.Sheets(strBiWeeklySheetName)
-On Error GoTo 0
-If objBiWeeklySheet Is Nothing Then
-    objTicketsSheet.Copy , objWorkbook.Sheets(objTicketsSheet.Index)
-    Set objBiWeeklySheet = objWorkbook.Sheets(objTicketsSheet.Index)
-    objBiWeeklySheet.Name = strBiWeeklySheetName
-End If
+        return (T)this.innerHandler.Parse(value);
+    }
 
-' Get the range of data in Tickets tab
-Dim objTicketsRange
-Set objTicketsRange = objTicketsSheet.UsedRange
-
-' Find the column numbers of the specified columns
-Dim objTicketsHeaderRow
-Set objTicketsHeaderRow = objTicketsRange.Rows(1)
-Dim colCaseNum
-colCaseNum = objTicketsHeaderRow.Find("Case#").Column
-Dim colDescription
-colDescription = objTicketsHeaderRow.Find("Description").Column
-Dim colStatus
-colStatus = objTicketsHeaderRow.Find("Status").Column
-Dim colRequestedOrganization
-colRequestedOrganization = objTicketsHeaderRow.Find("Requested For Organization").Column
-Dim colUpdatesComments
-colUpdatesComments = objTicketsHeaderRow.Find("Updates/Comments").Column
-
-' Copy the data to BiWeeklyTickets tab
-Dim objBiWeeklyRange
-Set objBiWeeklyRange = objBiWeeklySheet.Cells(1, 1)
-objTicketsRange.Copy Destination:=objBiWeeklyRange
-Dim objBiWeeklyDataRange
-Set objBiWeeklyDataRange = objBiWeeklyRange.CurrentRegion
-objBiWeeklyDataRange.Columns(colCaseNum).Delete
-objBiWeeklyDataRange.Columns(colDescription).Delete
-objBiWeeklyDataRange.Columns(colStatus).Delete
-objBiWeeklyDataRange.Columns(colRequestedOrganization).Delete
-objBiWeeklyDataRange.Columns(colUpdatesComments).Delete
-
-' Save and close the workbook
-objWorkbook.Save
-objWorkbook.Close
-
-' Clean up objects
-Set objBiWeeklySheet = Nothing
-Set objTicketsSheet = Nothing
-Set objTicketsRange = Nothing
-Set objBiWeeklyRange = Nothing
-Set objBiWeeklyDataRange = Nothing
-Set objWorkbook = Nothing
-Set objExcel = Nothing
-
-MsgBox "Data copied to BiWeeklyTickets tab successfully."
-
-Dim currentPath
-currentPath = CreateObject("Scripting.FileSystemObject").GetParentFolderName(WScript.ScriptFullName)
-WScript.Echo "Current path: " & currentPath
-
+    public override void SetValue(IDbDataParameter parameter, T value)
+    {
+        this.innerHandler.SetValue(parameter, value);
+    }
+}
