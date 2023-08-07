@@ -1,0 +1,78 @@
+import { Component, Input, Output, EventEmitter } from '@angular/core';
+
+@Component({
+  selector: 'app-ospgrid',
+  template: `
+    <ag-grid-angular
+      style="width: 500px; height: 200px;"
+      class="ag-theme-alpine"
+      [rowData]="rowData"
+      [columnDefs]="columnDefs"
+      (gridReady)="onGridReady($event)"
+    ></ag-grid-angular>
+  `,
+  styles: ['.ag-theme-alpine { height: 100%; }']
+})
+export class OspgridComponent {
+  @Input() rowData: any[] = [];
+  @Input() columnDefs: any[] = [];
+
+  @Output() selectionChanged = new EventEmitter<any[]>();
+
+  onGridReady(params: any) {
+    // You can access the ag-Grid instance here if needed
+  }
+
+  // Emit the selected rows whenever the selection changes
+  onSelectionChanged(event: any) {
+    const selectedRows = this.gridApi.getSelectedRows();
+    this.selectionChanged.emit(selectedRows);
+  }
+}
+
+
+@@@@@@@@@
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AgGridModule } from 'ag-grid-angular';
+
+import { OspgridComponent } from './ospgrid.component';
+
+@NgModule({
+  declarations: [OspgridComponent],
+  imports: [CommonModule, AgGridModule],
+  exports: [OspgridComponent], // Exporting the component to be used in other modules
+})
+export class OspgridModule { }
+
+@@@@@@@@
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  template: `
+    <app-ospgrid
+      [rowData]="rowData"
+      [columnDefs]="columnDefs"
+      (selectionChanged)="onSelectionChanged($event)"
+    ></app-ospgrid>
+  `,
+})
+export class AppComponent {
+  rowData = [
+    { make: 'Toyota', model: 'Celica', price: 35000 },
+    { make: 'Ford', model: 'Mondeo', price: 32000 },
+    { make: 'Porsche', model: 'Boxster', price: 72000 }
+  ];
+
+  columnDefs = [
+    { headerName: 'Make', field: 'make' },
+    { headerName: 'Model', field: 'model' },
+    { headerName: 'Price', field: 'price' }
+  ];
+
+  onSelectionChanged(selectedRows: any[]) {
+    // Handle the selected rows here
+    console.log('Selected Rows:', selectedRows);
+  }
+}
