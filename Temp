@@ -1,61 +1,10 @@
 public class JsonPropertyTypeHandler<T> : SqlMapper.TypeHandler<T>
 {
-    private readonly SqlMapper.ITypeHandler innerHandler;
+As of my last knowledge update in September 2021, jqGrid was not natively built to be fully compatible with Angular. jqGrid was primarily designed to work with jQuery and other JavaScript libraries, rather than being tailored specifically for integration with modern JavaScript frameworks like Angular.
 
-    public JsonPropertyTypeHandler()
-    {
-        this.innerHandler = SqlMapper.GetTypeHandler(typeof(T));
-    }
+While it's technically possible to use jqGrid within an Angular application, doing so might involve complex integration efforts and potential challenges. You would likely need to manage the integration manually, which could result in less seamless interaction and a less optimized performance compared to using grid libraries that are designed specifically for Angular.
 
-    public override T Parse(object value)
-    {
-        if (value is string json)
-        {
-            var jsonObject = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
-            var data = new Dictionary<string, object>();
+For Angular applications, it's generally recommended to choose data grid libraries that are built with Angular compatibility in mind. Libraries like AG Grid, Angular Material Data Table, and ngx-datatable are more suitable choices, as they offer smoother integration, better performance, and are designed to work effectively within Angular applications.
 
-            foreach (var kvp in jsonObject)
-            {
-                var propertyName = typeof(T).GetProperty(kvp.Key)?.Name ?? kvp.Key;
-                data.Add(propertyName, kvp.Value);
-            }
-
-            return (T)this.innerHandler.Parse(data);
-        }
-
-        return (T)this.innerHandler.Parse(value);
-    }
-
-    public override void SetValue(IDbDataParameter parameter, T value)
-    {
-        this.innerHandler.SetValue(parameter, value);
-    }
-}
-/===========
-public override User Parse(object value)
-    {
-        if (value is string json)
-        {
-            var dictionary = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
-            var user = new User();
-
-            foreach (var kvp in dictionary)
-            {
-                var property = typeof(User).GetProperty(kvp.Key);
-
-                if (property != null && property.CanWrite)
-                {
-                    property.SetValue(user, kvp.Value);
-                }
-            }
-
-            return user;
-        }
-
-        throw new ArgumentException("Value must be a JSON string.");
-    }
-
-    public override void SetValue(IDbDataParameter parameter, User value)
-    {
-        parameter.Value = JsonConvert.SerializeObject(value);
+However, I recommend checking the latest updates and developments, as software landscapes can change rapidly. It's possible that there have been changes or new approaches that have emerged since my last update. Always refer to official documentation and trusted sources for the most current information regarding the compatibility of jqGrid with Angular or any other JavaScript framework.
     }
