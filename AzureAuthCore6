@@ -1,0 +1,79 @@
+To implement Azure Authentication in a Web API built with .NET 6, you can use the Microsoft Authentication Library (MSAL) and the Azure Active Directory (Azure AD) for securing your API. Here's a general outline of the steps:
+
+1. **Create an Azure AD App Registration:**
+   - Go to the Azure portal (https://portal.azure.com).
+   - Create a new App Registration in your Azure AD tenant.
+   - Configure the Redirect URI for your API (e.g., `https://localhost:5001/signin-oidc` during development).
+   - Note down the "Application (client) ID" (Client ID) and the "Tenant ID" from the app registration.
+
+2. **Configure Authentication in Your Web API:**
+   - In your `Startup.cs` file, add the necessary authentication middleware to enable Azure AD authentication.
+
+   ```csharp
+   using Microsoft.AspNetCore.Authentication.AzureAD.UI;
+   using Microsoft.Extensions.Configuration;
+
+   public void ConfigureServices(IServiceCollection services)
+   {
+       services.AddAuthentication(AzureADDefaults.BearerAuthenticationScheme)
+           .AddAzureADBearer(options => Configuration.Bind("AzureAd", options));
+   }
+
+   public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+   {
+       app.UseAuthentication();
+       app.UseAuthorization();
+   }
+   ```
+
+3. **Configure Azure AD Settings:**
+   - In your `appsettings.json` (or `appsettings.Development.json`) file, configure the Azure AD settings:
+
+   ```json
+   "AzureAd": {
+     "Instance": "https://login.microsoftonline.com/",
+     "Domain": "<Your-Tenant-Domain>",
+     "ClientId": "<Your-Client-ID>",
+     "TenantId": "<Your-Tenant-ID>"
+   }
+   ```
+
+4. **Secure Your Web API Endpoints:**
+   - Use the `[Authorize]` attribute on specific controllers or actions that need authentication.
+
+   ```csharp
+   [ApiController]
+   [Route("api/[controller]")]
+   [Authorize]
+   public class ProtectedController : ControllerBase
+   {
+       // Your protected endpoints
+   }
+   ```
+
+5. **Handle Tokens in Your API:**
+   - You can access the user's claims (including the user's unique identifier, email, roles, etc.) from the `HttpContext.User` object.
+
+   ```csharp
+   [ApiController]
+   [Route("api/[controller]")]
+   [Authorize]
+   public class ProtectedController : ControllerBase
+   {
+       [HttpGet]
+       public IActionResult Get()
+       {
+           var user = HttpContext.User;
+           // Use the user's claims as needed
+           return Ok("You've reached a protected endpoint.");
+       }
+   }
+   ```
+
+6. **Testing and Running Your Web API:**
+   - Make sure your API is running over HTTPS (required for Azure AD) when testing with a secure token.
+   - Configure CORS if you need to allow requests from a specific client (e.g., an Angular app).
+
+Remember to replace `<Your-Tenant-Domain>`, `<Your-Client-ID>`, and `<Your-Tenant-ID>` with your actual Azure AD App Registration details.
+
+These steps provide a high-level guide to implementing Azure Authentication in your .NET 6 Web API. Make sure you handle token validation, configure CORS, and manage user roles as needed based on your specific use case. For more advanced scenarios, refer to the official documentation and explore additional authentication options: https://docs.microsoft.com/en-us/azure/active-directory/develop/authentication-scenarios
