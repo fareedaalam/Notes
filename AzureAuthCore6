@@ -75,5 +75,47 @@ To implement Azure Authentication in a Web API built with .NET 6, you can use th
    - Configure CORS if you need to allow requests from a specific client (e.g., an Angular app).
 
 Remember to replace `<Your-Tenant-Domain>`, `<Your-Client-ID>`, and `<Your-Tenant-ID>` with your actual Azure AD App Registration details.
+@@@@@@@@@@@@@@
+create you methood
+import { Injectable } from '@angular/core';
+import * as Msal from 'msal';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class AuthService {
+  private msalConfig: Msal.Configuration = {
+    auth: {
+      clientId: '<Your-Client-ID>',
+      authority: 'https://login.microsoftonline.com/<Your-Tenant-ID>',
+      redirectUri: 'http://localhost:4200',
+    },
+    cache: {
+      cacheLocation: 'localStorage',
+      storeAuthStateInCookie: false,
+    },
+  };
+
+  private msalInstance: Msal.UserAgentApplication;
+
+  constructor() {
+    this.msalInstance = new Msal.UserAgentApplication(this.msalConfig);
+  }
+
+  isAuthenticated(): boolean {
+    const user = this.msalInstance.getAccount();
+    return !!user;
+  }
+
+  login() {
+    return this.msalInstance.loginPopup();
+  }
+
+  logout() {
+    this.msalInstance.logout();
+  }
+
+  // Implement methods to acquire tokens and handle authentication
+}
 
 These steps provide a high-level guide to implementing Azure Authentication in your .NET 6 Web API. Make sure you handle token validation, configure CORS, and manage user roles as needed based on your specific use case. For more advanced scenarios, refer to the official documentation and explore additional authentication options: https://docs.microsoft.com/en-us/azure/active-directory/develop/authentication-scenarios
