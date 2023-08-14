@@ -121,3 +121,118 @@ export class GridComponent {
     return null;
   }
 }
+@@@@@@@@@@@@
+In Angular, you can determine when the ag-Grid is ready in the parent component by utilizing the ag-Grid Angular component's `(firstDataRendered)` event or by using a reference variable in the template. Here's how you can do it:
+
+**Using `(firstDataRendered)` event:**
+
+1. In the parent component's template, bind to the `(firstDataRendered)` event of the ag-Grid:
+
+```html
+<ag-grid-angular
+  style="width: 500px; height: 300px;"
+  class="ag-theme-alpine"
+  [rowData]="rowData"
+  [columnDefs]="columnDefs"
+  (firstDataRendered)="onGridReady($event)"
+></ag-grid-angular>
+```
+
+2. In the parent component's TypeScript code, implement the `onGridReady` method to handle the grid ready event:
+
+```typescript
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-parent',
+  template: `
+    <ag-grid-angular
+      style="width: 500px; height: 300px;"
+      class="ag-theme-alpine"
+      [rowData]="rowData"
+      [columnDefs]="columnDefs"
+      (firstDataRendered)="onGridReady($event)"
+    ></ag-grid-angular>
+  `,
+})
+export class ParentComponent {
+  rowData = [
+    { id: 1, name: 'John Doe', age: 30 },
+    { id: 2, name: 'Jane Smith', age: 28 },
+    // Add more data...
+  ];
+
+  columnDefs = [
+    { field: 'id' },
+    { field: 'name' },
+    { field: 'age' },
+    // Add more columns...
+  ];
+
+  onGridReady(event: any) {
+    // The ag-Grid is ready, and the first data has been rendered
+    console.log('ag-Grid is ready:', event);
+  }
+}
+```
+
+**Using a reference variable:**
+
+1. In the parent component's template, use a template reference variable on the ag-Grid:
+
+```html
+<ag-grid-angular
+  #agGrid
+  style="width: 500px; height: 300px;"
+  class="ag-theme-alpine"
+  [rowData]="rowData"
+  [columnDefs]="columnDefs"
+></ag-grid-angular>
+<button (click)="checkGridReady()">Check Grid Ready</button>
+```
+
+2. In the parent component's TypeScript code, implement the `checkGridReady` method to check if the grid is ready:
+
+```typescript
+import { Component, ViewChild } from '@angular/core';
+import { AgGridAngular } from 'ag-grid-angular';
+
+@Component({
+  selector: 'app-parent',
+  template: `
+    <ag-grid-angular
+      #agGrid
+      style="width: 500px; height: 300px;"
+      class="ag-theme-alpine"
+      [rowData]="rowData"
+      [columnDefs]="columnDefs"
+    ></ag-grid-angular>
+    <button (click)="checkGridReady()">Check Grid Ready</button>
+  `,
+})
+export class ParentComponent {
+  @ViewChild('agGrid') agGrid: AgGridAngular;
+
+  rowData = [
+    { id: 1, name: 'John Doe', age: 30 },
+    { id: 2, name: 'Jane Smith', age: 28 },
+    // Add more data...
+  ];
+
+  columnDefs = [
+    { field: 'id' },
+    { field: 'name' },
+    { field: 'age' },
+    // Add more columns...
+  ];
+
+  checkGridReady() {
+    if (this.agGrid && this.agGrid.gridOptions.api) {
+      // The ag-Grid is ready
+      console.log('ag-Grid is ready');
+    }
+  }
+}
+```
+
+In both approaches, the `ag-Grid` is considered ready when the data has been rendered for the first time. You can choose the approach that best fits your use case, whether you prefer handling the `(firstDataRendered)` event or using a template reference variable.
