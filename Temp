@@ -1,10 +1,51 @@
-public class JsonPropertyTypeHandler<T> : SqlMapper.TypeHandler<T>
-{
-As of my last knowledge update in September 2021, jqGrid was not natively built to be fully compatible with Angular. jqGrid was primarily designed to work with jQuery and other JavaScript libraries, rather than being tailored specifically for integration with modern JavaScript frameworks like Angular.
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
-While it's technically possible to use jqGrid within an Angular application, doing so might involve complex integration efforts and potential challenges. You would likely need to manage the integration manually, which could result in less seamless interaction and a less optimized performance compared to using grid libraries that are designed specifically for Angular.
+@Component({
+  selector: 'app-your-form',
+  templateUrl: './your-form.component.html',
+})
+export class YourFormComponent implements OnInit {
+  form: FormGroup;
+  initialFormValues: any;
+  isFormModified: boolean = false;
 
-For Angular applications, it's generally recommended to choose data grid libraries that are built with Angular compatibility in mind. Libraries like AG Grid, Angular Material Data Table, and ngx-datatable are more suitable choices, as they offer smoother integration, better performance, and are designed to work effectively within Angular applications.
+  constructor(private fb: FormBuilder) {}
 
-However, I recommend checking the latest updates and developments, as software landscapes can change rapidly. It's possible that there have been changes or new approaches that have emerged since my last update. Always refer to official documentation and trusted sources for the most current information regarding the compatibility of jqGrid with Angular or any other JavaScript framework.
+  ngOnInit(): void {
+    this.form = this.fb.group({
+      // Define your form controls here
+    });
+
+    // Store initial form values
+    this.initialFormValues = this.form.value;
+
+    // Subscribe to form value changes
+    this.form.valueChanges.subscribe(() => {
+      this.isFormModified = !this.isFormEqual(this.form.value, this.initialFormValues);
+    });
+  }
+
+  isFormEqual(formValue1: any, formValue2: any): boolean {
+    // Implement your own comparison logic here
+    return JSON.stringify(formValue1) === JSON.stringify(formValue2);
+  }
+
+  moveToNextPage() {
+    if (this.isFormModified) {
+      // Show a confirmation dialog asking to save changes
+      if (confirm('Do you want to save changes?')) {
+        // Perform save action here
+        this.saveChanges();
+      }
+    } else {
+      // Move to the next page without saving
     }
+  }
+
+  saveChanges() {
+    // Implement your save logic here
+    this.isFormModified = false;
+    // Move to the next page
+  }
+}
