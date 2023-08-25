@@ -1,0 +1,39 @@
+Add-Type -AssemblyName System.Security
+
+function Encrypt-Data {
+    param (
+        [string]$pstrData
+    )
+
+    $objNewkeyGenerator = [System.Security.Cryptography.Rfc2898DeriveBytes]::new((GetGuid), 16)
+    $objNewAlgorithm = [System.Security.Cryptography.Aes]::Create()
+
+    $objNewAlgorithm.IV = $objNewkeyGenerator.GetBytes($objNewAlgorithm.BlockSize / 8)
+    $objNewAlgorithm.Key = $objNewkeyGenerator.GetBytes($objNewAlgorithm.KeySize / 8)
+
+    $aByteNewRawData = [System.Text.Encoding]::Unicode.GetBytes($pstrData)
+    $memStream = [System.IO.MemoryStream]::new()
+
+    $cryptoStream = [System.Security.Cryptography.CryptoStream]::new(
+        $memStream,
+        $objNewAlgorithm.CreateEncryptor(),
+        [System.Security.Cryptography.CryptoStreamMode]::Write
+    )
+
+    $memStream.Write($objNewkeyGenerator.Salt, 0, $objNewkeyGenerator.Salt.Length)
+    $cryptoStream.Write($aByteNewRawData, 0, $aByteNewRawData.Length)
+    $cryptoStream.Close()
+
+    $aByteNewEncrypted = $memStream.ToArray()
+    $memStream.Close()
+
+    $encryptedData = [Convert]::ToBase64String($aByteNewEncrypted)
+    $newencryptused = $true
+
+    return $encryptedData
+}
+
+# Example usage
+$dataToEncrypt = "Hello, world!"
+$encryptedResult = Encrypt-Data -pstrData $dataToEncrypt
+Write-Host "Encrypted data: $encryptedResult"
