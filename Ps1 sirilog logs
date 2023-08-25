@@ -1,0 +1,34 @@
+# Install the Serilog package if you haven't already
+# Install-Package -Name Serilog -Source https://www.nuget.org/api/v2/package
+
+# Import the required namespaces
+Add-Type -TypeDefinition @"
+    using System;
+    using Serilog;
+    using Serilog.Events;
+"@
+
+# Configure Serilog
+$logger = [Serilog.Log]::Logger = [Serilog.Log]::LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .WriteTo.Console()
+    .WriteTo.File("log.txt", [Serilog.Events.LogEventLevel]::Information)
+    .CreateLogger()
+
+# Get input from the user
+$number1 = Read-Host "Enter a number"
+$number2 = Read-Host "Enter another number"
+
+# Convert input to numbers
+$number1 = [double]::Parse($number1)
+$number2 = [double]::Parse($number2)
+
+# Calculate the sum
+$sum = $number1 + $number2
+
+# Log the process
+$logger.Information("Numbers: {Number1}, {Number2}", $number1, $number2)
+$logger.Information("Sum: {Sum}", $sum)
+
+# Display the result
+Write-Host "The sum of $number1 and $number2 is $sum"
