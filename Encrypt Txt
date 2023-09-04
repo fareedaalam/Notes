@@ -37,3 +37,49 @@ function Encrypt-Data {
 $dataToEncrypt = "Hello, world!"
 $encryptedResult = Encrypt-Data -pstrData $dataToEncrypt
 Write-Host "Encrypted data: $encryptedResult"
+@@@@@@@@@@@@@@@@
+param (
+    [string]$PlainText,
+    [string]$EncryptionKey
+)
+
+# Create a random initialization vector (IV)
+$iv = [System.Security.Cryptography.Aes]::Create().IV
+
+# Convert the plaintext and IV to byte arrays
+$plaintextBytes = [System.Text.Encoding]::UTF8.GetBytes($PlainText)
+
+# Create an AES crypto service provider with the provided key
+$aes = [System.Security.Cryptography.AesManaged]::new()
+$aes.Key = [System.Text.Encoding]::UTF8.GetBytes($EncryptionKey)
+$aes.IV = $iv
+
+# Create a memory stream to store the ciphertext
+$memoryStream = [System.IO.MemoryStream]::new()
+
+# Create a crypto stream for encryption
+$cryptoStream = [System.Security.Cryptography.CryptoStream]::new(
+    $memoryStream,
+    $aes.CreateEncryptor(),
+    [System.Security.Cryptography.CryptoStreamMode]::Write
+)
+
+# Write the IV to the memory stream (for later use during decryption)
+$memoryStream.Write($iv, 0, $iv.Length)
+
+# Encrypt the plaintext and write it to the memory stream
+$cryptoStream.Write($plaintextBytes, 0, $plaintextBytes.Length)
+$cryptoStream.FlushFinalBlock()
+
+# Get the ciphertext as a byte array
+$ciphertextBytes = $memoryStream.ToArray()
+
+# Close streams
+$memoryStream.Close()
+$cryptoStream.Close()
+
+# Convert the ciphertext to a Base64-encoded string
+$encryptedText = [System.Convert]::ToBase64String($ciphertextBytes)
+
+# Output the encrypted text
+Write-Host "Encrypted Text: $encryptedText"
