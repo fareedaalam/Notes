@@ -29,7 +29,8 @@ function Encrypt-Data {
 
     $encryptedData = [Convert]::ToBase64String($aByteNewEncrypted)
     $newencryptused = $true
-
+$base64Data = "YourBase64EncodedDataHere"
+$encryptedData = [System.Convert]::FromBase64String($base64Data)
     return $encryptedData
 }
 
