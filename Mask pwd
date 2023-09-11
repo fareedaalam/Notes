@@ -1,0 +1,41 @@
+using System;
+
+class Program
+{
+    static void Main()
+    {
+        Console.Write("Enter your password: ");
+        string password = ReadPassword();
+
+        Console.WriteLine("\nPassword entered: " + password);
+    }
+
+    static string ReadPassword()
+    {
+        string password = "";
+        ConsoleKeyInfo key;
+
+        do
+        {
+            key = Console.ReadKey(true);
+
+            // Ignore non-character keys
+            if (key.Key != ConsoleKey.Backspace && key.Key != ConsoleKey.Enter)
+            {
+                password += key.KeyChar;
+                Console.Write("*");
+            }
+            else if (key.Key == ConsoleKey.Backspace && password.Length > 0)
+            {
+                password = password.Substring(0, password.Length - 1);
+                // Move the cursor back by one character and replace with a space to erase the asterisk
+                Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+                Console.Write(" ");
+                Console.SetCursorPosition(Console.CursorLeft - 1, Console.CursorTop);
+            }
+        } while (key.Key != ConsoleKey.Enter);
+
+        Console.WriteLine(); // Move to the next line
+        return password;
+    }
+}
