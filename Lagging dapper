@@ -1,0 +1,14 @@
+//oracle 
+SELECT *
+FROM (
+    SELECT YourTable.*, ROWNUM AS rn
+    FROM YourTable
+    WHERE YourCondition
+)
+WHERE rn >= :startRow AND rn <= :endRow;
+
+//Sql
+SELECT * FROM YourTable
+ORDER BY YourColumn
+OFFSET @PageSize * (@PageNumber - 1) ROWS
+FETCH NEXT @PageSize ROWS ONLY;
