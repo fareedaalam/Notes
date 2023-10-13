@@ -54,3 +54,49 @@ var channel = GrpcChannel.ForAddress("https://localhost:5001", new GrpcChannelOp
 {
     HttpClient = httpClient
 });
+
+///////////
+using Grpc.Net.Client;
+using Grpc.Core;
+using Google.Protobuf.WellKnownTypes;
+using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
+
+// Load your certificate from a file (e.g., "mycert.pfx") with a password (e.g., "123").
+var clientCertificate = new X509Certificate2("mycert.pfx", "123");
+
+var channelCredentials = new SslCredentials(clientCertificate);
+
+var channel = GrpcChannel.ForAddress("https://localhost:5001", new GrpcChannelOptions
+{
+    Credentials = channelCredentials,
+    HttpClient = new HttpClient(new HttpClientHandler
+    {
+        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+    })
+});
+
+// Create a JWT token (you should use a proper JWT library)
+var jwtToken = "your-jwt-token";
+
+// Create a channel with headers, including the authorization header.
+var headers = new Metadata
+{
+    { "authorization", "Bearer " + jwtToken }
+};
+var channelWithHeaders = new DefaultGrpcChannel(channel.Target, channel.Options.WithHeaders(headers));
+
+var client = new Greeter.GreeterClient(channelWithHeaders);
+
+var request = new HelloRequest { Name = "World" };
+
+var response = client.SayHello(request);
+
+Console.WriteLine(response.Message);
+
+// You can use the same client for other gRPC calls without passing headers individually.
+var otherRequest = new OtherRequest { Data = "Hello from other request" };
+var otherResponse = client.OtherMethod(otherRequest);
+Console.WriteLine(otherResponse.Response);
+
+// Ensure that you handle errors and perform proper certificate validation in a production application.
