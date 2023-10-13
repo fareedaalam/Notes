@@ -1,0 +1,56 @@
+using Grpc.Net.Client;
+using Grpc.Core;
+using Google.Protobuf.WellKnownTypes;
+using System.Net.Http;
+using System.Security.Cryptography.X509Certificates;
+
+// Load your certificate from a file (e.g., "mycert.pfx") with a password (e.g., "123").
+var clientCertificate = new X509Certificate2("mycert.pfx", "123");
+
+var channelCredentials = new SslCredentials(clientCertificate);
+
+var channel = GrpcChannel.ForAddress("https://localhost:5001", new GrpcChannelOptions
+{
+    Credentials = channelCredentials,
+    HttpClient = new HttpClient(new HttpClientHandler
+    {
+        ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+    })
+});
+
+// Create a JWT token (you should use a proper JWT library)
+var jwtToken = "your-jwt-token";
+
+var headers = new Metadata
+{
+    { "authorization", "Bearer " + jwtToken }
+};
+
+var client = new Greeter.GreeterClient(channel);
+
+var request = new HelloRequest { Name = "World" };
+
+var response = client.SayHello(request, headers);
+
+Console.WriteLine(response.Message);
+
+// Now, you can use the same channel for other gRPC calls.
+var otherRequest = new OtherRequest { Data = "Hello from other request" };
+var otherResponse = client.OtherMethod(otherRequest, headers);
+Console.WriteLine(otherResponse.Response);
+
+// Don't forget to handle errors and clean up resources appropriately in a production application.
+/ //////////////////
+var httpClientHandler = new HttpClientHandler();
+httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => {
+    // Implement custom certificate validation logic here if needed.
+    // For production, you should validate the certificate and handle validation errors.
+    return errors == SslPolicyErrors.None;
+};
+
+var httpClient = new HttpClient(httpClientHandler);
+
+var channel = GrpcChannel.ForAddress("https://localhost:5001", new GrpcChannelOptions
+{
+    HttpClient = httpClient
+});
