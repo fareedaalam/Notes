@@ -100,3 +100,17 @@ var otherResponse = client.OtherMethod(otherRequest);
 Console.WriteLine(otherResponse.Response);
 
 // Ensure that you handle errors and perform proper certificate validation in a production application.
+///////
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
+
+string certificatePath = "mycert.pfx"; // Update with your certificate path
+string certificatePassword = "123";     // Update with your certificate's password
+
+// Load the client certificate from the file.
+X509Certificate2 clientCertificate = new X509Certificate2(certificatePath, certificatePassword);
+
+// Convert the certificate to a string representation.
+string certificateString = Convert.ToBase64String(clientCertificate.Export(X509ContentType.Pfx), Base64FormattingOptions.InsertLineBreaks);
+
+// Now, you can use the certificateString or clientCertificate as needed.
