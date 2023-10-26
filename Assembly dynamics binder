@@ -1,0 +1,17 @@
+Imports System.Reflection
+
+Dim dllPath As String = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "YourDllName.dll")
+
+If System.IO.File.Exists(dllPath) Then
+    Dim assembly As Assembly = Assembly.LoadFrom(dllPath)
+    
+    ' Create an instance of a class from the DLL
+    Dim type As Type = assembly.GetType("Namespace.ClassName")
+    Dim instance As Object = Activator.CreateInstance(type)
+
+    ' Call a method from the instance using MethodInfo
+    Dim method As MethodInfo = type.GetMethod("MethodName")
+    method.Invoke(instance, Nothing)
+Else
+    ' Handle the case where the DLL doesn't exist
+End If
