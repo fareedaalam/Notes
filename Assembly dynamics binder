@@ -15,3 +15,23 @@ If System.IO.File.Exists(dllPath) Then
 Else
     ' Handle the case where the DLL doesn't exist
 End If
+////////////////
+Imports System.Reflection
+
+Dim dllPath As String = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "YourDllName.dll")
+
+If System.IO.File.Exists(dllPath) Then
+    Dim assembly As Assembly = Assembly.LoadFrom(dllPath)
+    
+    ' Find and call a static method from the loaded assembly
+    Dim type As Type = assembly.GetType("Namespace.ClassName")
+    Dim method As MethodInfo = type.GetMethod("StaticMethodName", BindingFlags.Public Or BindingFlags.Static)
+    
+    If method IsNot Nothing Then
+        method.Invoke(Nothing, Nothing)
+    Else
+        ' Handle the case where the method doesn't exist
+    End If
+Else
+    ' Handle the case where the DLL doesn't exist
+End If
