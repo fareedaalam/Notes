@@ -1,0 +1,31 @@
+If your `Config` class has a property named `CountryName`, you can apply the same principles to ensure that this property is loaded only once in the entire lifetime of the application. Here's how you can modify the `Config` class:
+
+```csharp
+public class Config
+{
+    private static Config instance;
+    private Lazy<string> _countryName = new Lazy<string>(() => LoadCountryName());
+
+    public static Config Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = new Config();
+            }
+            return instance;
+        }
+    }
+
+    public string CountryName => _countryName.Value;
+
+    private string LoadCountryName()
+    {
+        // Load the country name here
+        return "YourCountryName"; // Replace with your actual loading logic
+    }
+}
+```
+
+With this modification, the `CountryName` property will be loaded only once in the lifetime of your application, and you can access it using `Config.Instance.CountryName`. Make sure to replace `"YourCountryName"` with your actual logic for loading the country name.
