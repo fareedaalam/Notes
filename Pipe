@@ -1,0 +1,39 @@
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { forkJoin, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ApiService {
+
+  constructor(private http: HttpClient) { }
+
+  private handleError(error: HttpErrorResponse, apiName: string) {
+    if (error.url && error.url.includes('testerror')) {
+      return of({ error: `Error from ${apiName} API: ${error.message}` });
+    } else {
+      throw error; // Re-throw the error for other scenarios
+    }
+  }
+
+  getFirstApiData() {
+    return this.http.get('https://api.example.com/first').pipe(
+      catchError(error => this.handleError(error, 'First'))
+    );
+  }
+
+  getSecondApiData() {
+    return this.http.get('https://api.example.com/second').pipe(
+      catchError(error => this.handleError(error, 'Second'))
+    );
+  }
+
+  fetchDataFromBothApis() {
+    return forkJoin([
+      this.getFirstApiData(),
+      this.getSecondApiData()
+    ]);
+  }
+}
