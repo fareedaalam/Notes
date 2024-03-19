@@ -1,0 +1,7 @@
+Prompt ➜ You are an expert web designer and developer, I would like to recreate the website design that I have provided in the attached image using HTML and CSS and needs to be responsive as well. The website belongs to my company, [Your Company Name], and it serves as a [Brief Description of Your Brand] and this is my logo for the website [Provide the link]. The webpage is divided into a total of [Number of Sections] sections, and I’ll provide you with each section, You should not use the same content. Change the content that aligns to my brand. Provide me the code and guide on where to integrate it.
+
+There are [Number of Sections in the Image] sections in the attached image, Such as [ ] . [Brief Explanation of Each Section & its alignment ]. The image you should incorporate into the design is this: [Provide the Image link / links].
+
+You can use online svg for icons if required from Font awesome.
+
+Feel free to choose fonts that align with our brand identity and apply your expertise to enhance the overall styling of the website. I intend to use the CodePen application for copying and pasting the code. Please advise me on what to name the HTML and CSS files.
