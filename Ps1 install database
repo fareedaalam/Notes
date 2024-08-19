@@ -1,0 +1,36 @@
+param (
+    [string]$serverName = $(Read-Host "Enter SQL Server Name"),
+    [string]$databaseName = $(Read-Host "Enter Database Name"),
+    [string]$username = $(Read-Host "Enter SQL Username"),
+    [string]$password = $(Read-Host "Enter SQL Password" -AsSecureString)
+)
+
+# Convert password to plain text for SQL connection
+$passwordPlainText = [Runtime.InteropServices.Marshal]::PtrToStringAuto([Runtime.InteropServices.Marshal]::SecureStringToBSTR($password))
+
+# Get the current directory
+$folderPath = Get-Location
+
+# Get all SQL files in the current directory
+$sqlFiles = Get-ChildItem -Path $folderPath -Filter "*.sql"
+
+if ($sqlFiles.Count -eq 0) {
+    Write-Host "No SQL files found in the current directory."
+    exit
+}
+
+# Loop through each SQL file and execute
+foreach ($sqlFile in $sqlFiles) {
+    $sqlQuery = Get-Content $sqlFile.FullName -Raw
+    Write-Host "Executing $($sqlFile.Name)..."
+
+    # Build the SQL connection string
+    $connectionString = "Server=$serverName;Database=$databaseName;User Id=$username;Password=$passwordPlainText;"
+
+    # Execute the SQL script
+    Invoke-Sqlcmd -ConnectionString $connectionString -Query $sqlQuery -ErrorAction Stop
+
+    Write-Host "Executed $($sqlFile.Name) successfully."
+}
+
+Write-Host "All scripts executed successfully."
